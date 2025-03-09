@@ -6,17 +6,29 @@ const copy_url = `https://restcountries.com/v3.1/name/Pakistan?fullText=true`;
 console.log(copy_url);
 
 btn.addEventListener("click", async () => {
-  let country = document.getElementById("inp_box").value;
+  let country = document.getElementById("inp_box").value.trim();
 
+  if (country === "") {
+    apicontent.innerHTML = "<p style='color: red;'>Please enter a country name.</p>";
+    return;
+  }
   const url = `https://restcountries.com/v3.1/name/${country}?fullText=true`;
   console.log(url);
 
   try {
     let response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("Invalid country name. Please enter a valid country.");
+    }
+
     let data = await response.json();
 
+    if (data.status === 404 || data.length === 0) {
+      throw new Error("Country not found.");
+    }
+
     let countrydata = data[0];
-    // console.log(countrydata);
 
     let capital = countrydata.capital?.[0] || "N/A";
     let borders = countrydata.borders?.join(" ,") || "No borders";
